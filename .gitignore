@@ -1,4 +1,4 @@
 # created by virtualenv automatically
 
-logs/*
-*.pytest_cache
+logs
+.pytest_cache

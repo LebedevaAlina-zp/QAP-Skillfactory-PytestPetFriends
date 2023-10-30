@@ -1,4 +1,8 @@
-# created by virtualenv automatically
+#virtualenv
+Lib
+Scripts
+.env
+pyvenv.cfg
 
 logs
 .pytest_cache

@@ -3,6 +3,7 @@ Lib
 Scripts
 .env
 pyvenv.cfg
+.idea
 
 logs
 .pytest_cache

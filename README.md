@@ -29,5 +29,5 @@ the ini file. Mark some tests with x_fail, skip labels.
 3. Write a decorator that will log requests in API tests. With this decorator, we mark functions that send requests 
 to the application under test. After passing the test, a file appears on the hard disk log.txt , which contains: 
 the request headers, path parameters, string parameters and the body; the response code and body.
-4. Devide the code of the tests into separate  test files according to their functionality.
+4. Devide the code of the tests into separate test files according to their functionality.
 5. Parametrize the tests existing: API requests parameters for positive and negative cases, headers Accept and Content-type

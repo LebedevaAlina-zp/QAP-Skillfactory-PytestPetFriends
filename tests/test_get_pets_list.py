@@ -34,11 +34,8 @@ def test_unacceptable_filter(get_key, filter):
 @pytest.mark.negative
 @pytest.mark.parametrize('auth_key',
                          [{'key': ''}, {'key': f'{generate_str.n_string(255)}'},
-                          {'key': f'{generate_str.n_string(1000)}'}, {'key': f'{generate_str.russian_chars()}'},
-                          {'key': f'{generate_str.chinese_chars()}'}, {'key': f'{generate_str.special_chars()}'},
-                          {'key': 5}],
-                         ids=['empty str', '255 chars', '1000 chars', 'russian chars', 'chinese chars', 'special chars',
-                              'integer'])
+                          {'key': f'{generate_str.n_string(1000)}'}, {'key': '5'}],
+                         ids=['empty str', '255 chars', '1000 chars', 'integer'])
 def test_my_pets_wrong_key(auth_key, filter='my_pets'):
     """Check a user can't get a list of pets with a wrong auth_key."""
 

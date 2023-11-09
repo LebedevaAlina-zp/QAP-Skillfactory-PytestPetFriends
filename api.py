@@ -12,6 +12,7 @@ def my_api_logs(func):
         time_start = datetime.datetime.now()
         time_start_formatted = time_start.strftime("%Y-%m-%d_%H-%M-%S")
         with open(log_filename, "a+") as log_file:
+            log_file.write(f"\n==========================================================================\n")
             # Write into the log file from where the api request function was run
             log_file.write(f"{inspect.currentframe().f_back}\n\n")
             # Write into the log file an api request function's name and time of start
@@ -23,7 +24,6 @@ def my_api_logs(func):
         with open(log_filename, "a") as log_file:
             # Write into the log file the api function run time
             log_file.write(f"{func.__name__} completed in {run_time}\n")
-            log_file.write(f"\n==========================================================================\n\n")
         return result
     return wrapper
 

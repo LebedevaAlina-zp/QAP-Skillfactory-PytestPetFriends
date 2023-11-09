@@ -26,9 +26,12 @@ def test_valid_user(email, password):
 @pytest.mark.negative
 @pytest.mark.parametrize('email',
                          ['', generate_str.n_string(255), generate_str.n_string(1000),
-                          generate_str.special_chars(), generate_str.russian_chars(), generate_str.chinese_chars(), 59],
+                          #generate_str.special_chars(), generate_str.russian_chars(), generate_str.chinese_chars(),
+                          # Not allowed for hhtp requests to have not ASCII symbols in headers
+                          '59'],
                          ids=['empty string', '255 chars', '1000 chars',
-                              'special chars', 'russian chars', 'chinese chars', 'integer'])
+                              #'special chars', 'russian chars', 'chinese chars',
+                              'integer'])
 def test_wrong_email(email, password=valid_password):
     """Check a user can't get an auth_key using get_api_key method with a wrong password"""
 
@@ -44,9 +47,12 @@ def test_wrong_email(email, password=valid_password):
 @pytest.mark.negative
 @pytest.mark.parametrize('password',
                          ['', generate_str.n_string(255), generate_str.n_string(1000), valid_password.upper(),
-                          generate_str.special_chars(), generate_str.russian_chars(), generate_str.chinese_chars(), 59],
+                          #generate_str.special_chars(), generate_str.russian_chars(), generate_str.chinese_chars(),
+                          # Not allowed for hhtp requests to have not ASCII symbols in headers
+                          '59'],
                          ids=['empty string', '255 chars', '1000 chars', 'password capslock',
-                              'special chars', 'russian chars', 'chinese chars', 'integer'])
+                              #'special chars', 'russian chars', 'chinese chars',
+                              'integer'])
 def test_wrong_password(password, email=valid_email):
     """Check a user can't get an auth_key using get_api_key method with a wrong password"""
 

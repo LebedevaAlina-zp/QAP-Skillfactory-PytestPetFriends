@@ -33,7 +33,7 @@ def test_valid_user(email, password):
                               #'special chars', 'russian chars', 'chinese chars',
                               'integer'])
 def test_wrong_email(email, password=valid_password):
-    """Check a user can't get an auth_key using get_api_key method with a wrong password"""
+    """Check a user can't get an auth_key using get_api_key method with a wrong email"""
 
     #Make a request and save a resposponse status
     status, _ = pf.get_api_key(email, password)

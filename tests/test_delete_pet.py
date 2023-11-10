@@ -1,6 +1,7 @@
 import pytest
 from api import PetFriends
 from settings import valid_email, valid_password
+import generate_str
 
 
 pf = PetFriends()
@@ -16,8 +17,8 @@ def test_positive(get_key):
 
     # If the list is empty add a new pet and request the list of user's pet once again
     if len(my_pets['pets']) == 0:
-        pf.add_new_pet(get_key, "Pettypet", "bird", "3", "images/cat1.jpeg")
-        _, my_pets = pf.get_pets_list(get_key, "my_pets")
+        _, new_pet = pf.add_new_pet(get_key, "Pettypet", "bird", "3", "images/cat1.jpeg")
+        my_pets = {'pets':[new_pet]}
 
     # Save the id of the first pet in the list in pet_id and try to delete one
     pet_id = my_pets['pets'][0]['id']
@@ -31,6 +32,20 @@ def test_positive(get_key):
     assert status == 200
     assert pet_id not in my_pets.values()
 
+
+@pytest.mark.delete
+@pytest.mark.negative
+@pytest.mark.parametrize('pet_id',
+                         ['', generate_str.n_string(255), generate_str.n_string(1000)],
+                         ids=['empty string', '255 chars', '1000 chars'])
+def test_wrong_pet_id(get_key, pet_id):
+    """Check a user get a 404 pesponse status for delete request with wrong pet_id value as it's a part of the request URL."""
+
+    status, _ = pf.delete_pet(get_key, pet_id)
+
+    assert status == 404
+
+
 @pytest.mark.delete
 @pytest.mark.negative
 @pytest.mark.skip(reason="Currently any user can delete someone else's pet. The test is not polite with other user's "
@@ -38,8 +53,6 @@ def test_positive(get_key):
                          " to delete it.")
 def test_someone_elses_pet(get_key):
     """Check a user cannot delete someone else's pet (not from "my_pets" pets list)"""
-
-    # !!!Attention! Bug found here. A user actually can delete someone else's pet.
 
     # Get a list of all the pets all_pets and a list of user's pets my_pets.
     _, all_pets = pf.get_pets_list(get_key, '')
@@ -69,3 +82,22 @@ def test_someone_elses_pet(get_key):
     # Check the deletion was unsuccessful: status code is not 200 and a pet with pet_id is still in all_pets list
     assert status != 200
     assert pet_id in all_pets['pets'].values()
+
+
+@pytest.mark.delete
+@pytest.mark.negative
+@pytest.mark.parametrize('auth_key',
+                         [{'key': ''}, {'key': f'{generate_str.n_string(255)}'},
+                          {'key': f'{generate_str.n_string(1000)}'}],
+                         ids=['empty str', '255 chars', '1000 chars'])
+def test_wrong_key(get_key, auth_key):
+    ''' Check one cannot delete a pet having a wrong auth_key'''
+
+    # First add a pet
+    _, new_pet = pf.add_new_pet_without_photo(get_key, "Pettypet", "bird", "3")
+    pet_id = new_pet['id']
+
+    # Try to delete it
+    status, _ = pf.delete_pet(auth_key, pet_id)
+
+    assert status == 403

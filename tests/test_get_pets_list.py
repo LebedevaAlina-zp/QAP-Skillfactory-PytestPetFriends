@@ -10,8 +10,8 @@ pf = PetFriends()
 @pytest.mark.parametrize('filter', ['', 'my_pets'],
                          ids=['no filter', 'my_pets'])
 def test_valid_filter(get_key, filter):
-    """Check the response status is 200 and the result contains a non-empty list of pets when a request via
-    get_pets_list method with empty filter is made"""
+    """Check the response status is 200 and the result contains a non-empty list of pets for get_pets_list request with
+     valid filters"""
 
     status, result = pf.get_pets_list(get_key, filter)
     assert status == 200
@@ -26,9 +26,11 @@ def test_valid_filter(get_key, filter):
                           generate_str.chinese_chars(), generate_str.special_chars()],
                          ids=['255 chars', '1000 chars', 'russian chars', 'chinese chars', 'special chars'])
 def test_unacceptable_filter(get_key, filter):
-    """Check the response code is 400 for all unacceptable filter values sent with a request for pets list."""
+    """Check the response code is 400 for all unacceptable filter values sent for a pets list request."""
+
     status, result = pf.get_pets_list(get_key, filter)
     assert status == 400
+
 
 @pytest.mark.list
 @pytest.mark.negative

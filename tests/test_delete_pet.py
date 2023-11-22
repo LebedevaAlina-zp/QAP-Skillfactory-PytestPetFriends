@@ -17,10 +17,10 @@ def test_positive(get_key):
 
     # If the list is empty add a new pet and request the list of user's pet once again
     if len(my_pets['pets']) == 0:
-        _, new_pet = pf.add_new_pet(get_key, "Pettypet", "bird", "3", "images/cat1.jpeg")
+        _, new_pet = pf.add_new_pet(get_key, "Pettypet", "bird", "3", "images/jpeg_pic.jpeg")
         my_pets = {'pets':[new_pet]}
 
-    # Save the id of the first pet in the list in pet_id and try to delete one
+    #Save the id of the first pet in the list in pet_id and try to delete one
     pet_id = my_pets['pets'][0]['id']
     status, _ = pf.delete_pet(get_key, pet_id)
 
@@ -48,9 +48,7 @@ def test_wrong_pet_id(get_key, pet_id):
 
 @pytest.mark.delete
 @pytest.mark.negative
-@pytest.mark.skip(reason="Currently any user can delete someone else's pet. The test is not polite with other user's "
-                         "pet deletion =(( It should be changed: another user adds a new pet and then main user tries"
-                         " to delete it.")
+#@pytest.mark.skip(reason="Currently any user can delete someone else's pet.")
 @pytest.mark.parametrize('image', [0, 1], ids=['pet without photo', 'pet with a photo'])
 def test_someone_elses_pet(get_key, other_key, image):
     """Check a user cannot delete someone else's pet (not from "my_pets" pets list)"""

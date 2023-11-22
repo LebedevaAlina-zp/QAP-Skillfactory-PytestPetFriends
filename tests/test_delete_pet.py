@@ -51,37 +51,25 @@ def test_wrong_pet_id(get_key, pet_id):
 @pytest.mark.skip(reason="Currently any user can delete someone else's pet. The test is not polite with other user's "
                          "pet deletion =(( It should be changed: another user adds a new pet and then main user tries"
                          " to delete it.")
-def test_someone_elses_pet(get_key):
+@pytest.mark.parametrize('image', [0, 1], ids=['pet without photo', 'pet with a photo'])
+def test_someone_elses_pet(get_key, other_key, image):
     """Check a user cannot delete someone else's pet (not from "my_pets" pets list)"""
 
-    # Get a list of all the pets all_pets and a list of user's pets my_pets.
-    _, all_pets = pf.get_pets_list(get_key, '')
-    _, my_pets = pf.get_pets_list(get_key, 'my_pets')
-
-    # If all_pets and my_pets lists are of the same length (there are no pets of other users) then raise an Ecxeption
-    if len(my_pets['pets']) == len(all_pets['pets']):
-        raise Exception("There are no other users' pets.")
-
-    # Now find a pet from all_pets list that is not in my_pets
-    # Save the id of the first pet in all_pets list into pet_id variable.
-    i = 0
-    pet_id = all_pets['pets'][i]['id']
-
-    # If my_pets is not empty then:
-    if len(my_pets['pets']) != 0:
-        # Check the pet with pet_id is not in my_pets list
-        for pet in my_pets['pets']:
-            # And if it is then take the next pet from all_pets list and check it's not in my_pets list in another loop
-            if pet['id'] == pet_id:
-                i += 1
-                pet_id = all_pets['pets'][i]['id']
+    # Add a pet using other's user auth key
+    if image == 0:
+        _, pet = pf.add_new_pet_without_photo(other_key, 'Alice', 'Cat', '3')
+    else:
+        _, pet = pf.add_new_pet(other_key, 'Alice', 'Cat', '3', 'images/jpg_pic.jpg')
 
     # Try to delete someone else's pet
-    status, _ = pf.delete_pet(get_key, pet_id)
+    status, _ = pf.delete_pet(get_key, pet['id'])
 
-    # Check the deletion was unsuccessful: status code is not 200 and a pet with pet_id is still in all_pets list
-    assert status != 200
-    assert pet_id in all_pets['pets'].values()
+    # Get a list of all the pets all_pets and a list of user's pets my_pets.
+    _, other_user_pets = pf.get_pets_list(other_key, 'my_pets')
+
+    # Check the deletion was unsuccessful: status code is 403 and a pet with pet_id is still in all_pets list
+    assert status == 403
+    assert other_pet['id'] in other_user_pets.values()
 
 
 @pytest.mark.delete

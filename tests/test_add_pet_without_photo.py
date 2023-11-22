@@ -64,7 +64,7 @@ def test_invalid_name(get_key, name, animal_type="Kitten", age="0"):
 @pytest.mark.parametrize('animal_type',
                          ['', generate_str.n_string(1000), generate_str.chinese_chars(), generate_str.special_chars()],
                          ids=['empty str', '1000 chars', 'chinese chars', 'special chars'])
-def test_invalid_name(get_key, animal_type, name='Whitney', age="0"):
+def test_invalid_animal_type(get_key, animal_type, name='Whitney', age="0"):
     """Check a user can't add a pet with incorrect values for animal type, and get a server rensponse 400 but not 500."""
 
     # Add a new pet without a photo

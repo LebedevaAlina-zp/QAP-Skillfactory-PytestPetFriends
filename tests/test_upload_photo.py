@@ -13,29 +13,19 @@ pf = PetFriends()
 @pytest.mark.add_photo
 @pytest.mark.positive
 @pytest.mark.parametrize("pet_photo",
-                         ["images/jpg_pic.jpg", "images/jpeg_pic.jpeg",
+                         ["images/jpg_pic.jpg", "images/jpeg_pic.jpeg", "images/HD_jpg.jpg",
                           #"images/png_pic.jpg", Currently a png image cannot be added.
                           ],
-                         ids=["jpg picture", "jpeg picture"]) #"png image is not allowed
+                         ids=["jpg picture", "jpeg picture", "HD image"]) #"png image is not allowed
 def test_positive(get_key, pet_photo):
      """Check if a user can upload different images to his pet's card without photo."""
 
      # Get the absolute path of pet's photo and save it to the pet_photo variable
      pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
-     # Get a list of user's pets my_pets
-     _, my_pets = pf.get_pets_list(get_key, "my_pets")
-
-     # Go through my_pets list
-     for i in range(0, len(my_pets["pets"])):
-         # Find a pet without a photo and try to upload the image to its card
-         if my_pets["pets"][i]["pet_photo"] == "":
-             status, result = pf.add_pets_photo(get_key, my_pets["pets"][i]['id'], pet_photo)
-             break
-         # If there are no pets without a photo then add one, and upload the image to its card
-         if i == len(my_pets["pets"]) -1:
-             _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
-             status, result = pf.add_pets_photo(get_key, simple_pet['id'], pet_photo)
+     # Add a pet without a photo, then upload the image to its card
+     _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
+     status, result = pf.add_pets_photo(get_key, simple_pet['id'], pet_photo)
 
      assert status == 200
      assert result['pet_photo'] != ""
@@ -53,19 +43,11 @@ def test_wrong_key(get_key, auth_key, pet_photo="images/jpeg_pic.jpeg"):
     # Get the absolute path of pet's photo and save it to the pet_photo variable
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
-    # Get a list of user's pets my_pets
-    _, my_pets = pf.get_pets_list(get_key, "my_pets")
+    # Add a pet without a photo
+    _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
 
-    # Go through my_pets list
-    for i in range(0, len(my_pets["pets"])):
-        # Find a pet without a photo and try to upload the image to its card
-        if my_pets["pets"][i]["pet_photo"] == "":
-            status, result = pf.add_pets_photo(auth_key, my_pets["pets"][i]['id'], pet_photo)
-            break
-        # If there are no pets without a photo then add one, and upload the image to its card
-        if i == len(my_pets["pets"]) - 1:
-            _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
-            status, result = pf.add_pets_photo(auth_key, simple_pet['id'], pet_photo)
+    # Try to upload the image to its card using wrong auth_key
+    status, result = pf.add_pets_photo(auth_key, simple_pet['id'], pet_photo)
 
     assert status == 403
 
@@ -90,26 +72,45 @@ def test_wrong_pet_id(get_key, pet_id, pet_photo="images/jpeg_pic.jpeg"):
 @pytest.mark.add_photo
 @pytest.mark.negative
 @pytest.mark.parametrize("pet_photo",
-                         ["images/txt.txt", "images/broken_jpeg.jpeg", "images/HD_jpg.jpg"],
-                         ids=["txt file", "broken jpeg", "HD image"])
+                         ["images/txt.txt", "images/broken_jpeg.jpeg"],
+                         ids=["txt file", "broken jpeg"])
 def test_wrong_image_file(get_key, pet_photo):
-     """Check requests to upload different types of files instead of jpg image do not cause response code 500."""
+     """Check requests to upload different types of files instead of jpg image get 400 response status code.."""
 
      # Get the absolute path of pet's photo and save it to the pet_photo variable
      pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
-     # Get a list of user's pets my_pets
-     _, my_pets = pf.get_pets_list(get_key, "my_pets")
+     # Add a pet without a photo, then upload the image to its card
+     _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
+     status, result = pf.add_pets_photo(get_key, simple_pet['id'], pet_photo)
 
-     # Go through my_pets list
-     for i in range(0, len(my_pets["pets"])):
-         # Find a pet without a photo and try to upload the image to its card
-         if my_pets["pets"][i]["pet_photo"] == "":
-             status, result = pf.add_pets_photo(get_key, my_pets["pets"][i]['id'], pet_photo)
-             break
-         # If there are no pets without a photo then add one, and upload the image to its card
-         if i == len(my_pets["pets"]) -1:
-             _, simple_pet = pf.add_new_pet_without_photo(get_key, "Kitty", "cat", "2")
-             status, result = pf.add_pets_photo(get_key, simple_pet['id'], pet_photo)
+     assert status == 400
 
-     assert status != 500
+
+@pytest.mark.add_photo
+@pytest.mark.negative
+def test_upload_other_users_pet_photo(get_key, other_key, pet_photo="images/jpeg_pic.jpeg"):
+     """Check that a user cannot upload a photo to other user's pet's card."""
+
+     # Get the absolute path of pet's photo and save it to the pet_photo variable
+     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+     # Add a pet without a photo for the other user, then upload the image to its card
+     _, simple_pet = pf.add_new_pet_without_photo(other_key, "Kitty", "cat", "2")
+     status, result = pf.add_pets_photo(get_key, simple_pet['id'], pet_photo)
+
+     assert status == 403
+
+
+@pytest.mark.add_photo
+@pytest.mark.negative
+def test_upload_one_more_pet_photo(get_key, pet_with_image, pet_photo="images/jpeg_pic.jpeg"):
+     """Check one cannot upload a photo to a pet's card that already has a photo."""
+
+     # Get the absolute path of pet's photo and save it to the pet_photo variable
+     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+     # Try to upload the image to a pet's card with the image
+     status, result = pf.add_pets_photo(get_key, pet_with_image, pet_photo)
+
+     assert status == 400

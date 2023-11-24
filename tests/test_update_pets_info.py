@@ -146,3 +146,18 @@ def test_invalid_animal_type(get_key, pet_with_image, age, name='Kitty', animal_
     status, result = pf.update_pet_info(get_key, pet_with_image['id'], name, animal_type, age)
 
     assert status == 400
+
+
+@pytest.mark.skip("By now any user can change other user's pet's info!")
+@pytest.mark.update
+@pytest.mark.negative
+def test_update_other_users_pet(get_key, other_key, name='Kitty', animal_type='siamese cat', age='3'):
+    """Check a user can't update other user's pet's info. """
+
+    # Add a pet using other user's key
+    _, pet = pf.add_new_pet(other_key, name='Maopang', animal_type='Cat', age='10', pet_photo='images/jpeg_pic.jpeg')
+
+    # Try to update the just creatd other user's pet's info
+    status, result = pf.update_pet_info(get_key, pet['id'], name, animal_type, age)
+
+    assert status == 403

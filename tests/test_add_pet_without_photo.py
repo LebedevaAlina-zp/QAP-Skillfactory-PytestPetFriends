@@ -14,8 +14,9 @@ pf = PetFriends()
                          ['Kitten', generate_str.russian_chars(), generate_str.n_string(255)],
                          ids=['latin animal type', 'russian animal type', '255 chars animal type'])
 @pytest.mark.parametrize('age',
-                         ['10', '  4  ', '0'],
-                         ids=['integer age', 'int with spaces age', '0 age'])
+                         ['10', '  4  ', '0', '4.3', '4,5'],
+                         ids=['integer age', 'int with spaces age', '0 age',
+                              'noninteger with a dot', 'noninteger with a coma'])
 def test_valid_data(get_key, name, animal_type, age):
     """Check a user can add a pet without a photo correctly with differrent valid names, animal types and ages."""
 
@@ -78,9 +79,9 @@ def test_invalid_animal_type(get_key, animal_type, name='Whitney', age="0"):
 @pytest.mark.add_simple
 @pytest.mark.negative
 @pytest.mark.parametrize('age',
-                         ['', '-12', '4.3', '4,5', generate_str.n_string(255), generate_str.n_string(1000),
+                         ['', '-12', '200', generate_str.n_string(255), generate_str.n_string(1000),
                           generate_str.chinese_chars(), generate_str.special_chars()],
-                         ids=['empty str', 'negative number', 'noninteger with a dot', 'noninteger with a coma',
+                         ids=['empty str', 'negative number', 'too old for a pet',
                               '255 chars', '1000 chars', 'chinese chars', 'special chars'])
 def test_invalid_age(get_key, age, name="Kitty", animal_type="Kitten"):
     """Check a user can't add a pet with incorrect values for pet's age, and get a server rensponse 400 but not 500."""

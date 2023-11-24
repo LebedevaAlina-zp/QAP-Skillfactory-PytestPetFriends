@@ -113,7 +113,7 @@ class PetFriends:
         результат в формате JSON с данными добавленного питомца"""
 
         # Detect the format of pet's photo
-        image_format = 'image/jpeg' if pet_photo[-4:-1] in ('.jpg', 'jpeg') else 'image/png'
+        image_format = 'image/jpeg' if pet_photo[-4:] in ('.jpg', 'jpeg') else 'image/png'
 
         data = MultipartEncoder(
             fields={
@@ -188,7 +188,7 @@ class PetFriends:
         Метод добавляет фото формата jpg или png к существующей карточке питомца без фото."""
 
         # Detect the format of pet's photo
-        image_format = 'image/jpeg' if pet_photo[-4:-1] in ('.jpg', 'jpeg') else 'image/png'
+        image_format = 'image/jpeg' if pet_photo[-4:] in ('.jpg', 'jpeg') else 'image/png'
 
         data = MultipartEncoder(
             fields={

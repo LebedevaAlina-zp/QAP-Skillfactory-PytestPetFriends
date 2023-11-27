@@ -5,5 +5,5 @@ Scripts
 pyvenv.cfg
 .idea
 
-logs
+logs/*
 .pytest_cache

@@ -41,3 +41,24 @@ def time_delta():
     print(f"\nThe test lasted: {end_time - start_time}")
 
 
+@pytest.fixture(scope="module", autouse=True)
+def cleanup(get_key, other_key):
+    """ A fixture to clean up both user's pet's list empty after all the tests done. """
+
+    yield
+
+    # Get a list of user's pets
+    _, my_pets = pf.get_pets_list(get_key, "my_pets")
+
+    # Delete all user's pets
+    for i in range(0, len(my_pets['pets'])):
+    #Save the id of the first pet in the list in pet_id and try to delete one
+        status, _ = pf.delete_pet(get_key, my_pets['pets'][i]['id'])
+
+    # Get a list of user's pets
+    _, my_pets = pf.get_pets_list(other_key, "my_pets")
+
+    # Delete all user's pets
+    for i in range(0, len(my_pets['pets'])):
+    #Save the id of the first pet in the list in pet_id and try to delete one
+        status, _ = pf.delete_pet(other_key, my_pets['pets'][i]['id'])

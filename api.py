@@ -38,11 +38,12 @@ class PetFriends:
 
 
     @my_api_logs
-    def get_api_key(self, email: str, password: str) -> json:
+    def get_api_key(self, email: str, password: str, accept="application/json") -> json:
         """To obtain an auth_key the method makes a GET request transmitting user's email and password to the server
         and returns a response status code and a JSON result containing a unique key corresponded to that user"""
 
         headers = {
+            'accept': accept,
             'email': email,
             'password': password
         }
@@ -58,13 +59,18 @@ class PetFriends:
         return status, result
 
     @my_api_logs
-    def get_pets_list(self, auth_key: json, filter: str = "") -> json:
+    def get_pets_list(self, auth_key: json, filter: str = "",
+                      accept="application/json", content_type="application/json") -> json:
         """To get a list of pets the method makes a GET request transmitting an auth_key to the server
         and returns a response status and a JSON formatted result containing a list of pets available to the user
         filtered by 'filter' which can take either '' or 'my_pets'. With a filter '' the user gets a list of all pets.
         With a filter 'my_pets' the user gets a list of his pets only"""
 
-        headers = {'auth_key': auth_key['key']}
+        headers = {
+            'content-type': content_type,
+            'accept': accept,
+            'auth_key': auth_key['key']
+        }
         filter = {'filter': filter}
 
         res = self.logged_requests.get(self.base_url + '/api/pets', headers=headers, params=filter)
@@ -78,7 +84,8 @@ class PetFriends:
         return status, result
 
     @my_api_logs
-    def add_new_pet_without_photo(self, auth_key: json, name: str, animal_type: str, age: str) -> json:
+    def add_new_pet_without_photo(self, auth_key: json, name: str, animal_type: str, age: str,
+                                  accept="application/json", content_type="") -> json:
         """To add a new pet without a photo the method makes a POST request to the server transmitting valid auth_key,
         animal's name, animal_type (for instance, German Shepherd), age
         and returns response status code and json formatted result with created pet's data"""
@@ -89,7 +96,11 @@ class PetFriends:
                 'animal_type': animal_type,
                 'age': age,
             })
-        headers = {'auth_key': auth_key['key'], 'Content-Type': data.content_type}
+
+        if content_type == "":
+            content_type = data.content_type
+
+        headers = {'auth_key': auth_key['key'], 'accept': accept, 'Content-Type': content_type}
 
         res = self.logged_requests.post(self.base_url + '/api/create_pet_simple', headers=headers, data=data)
 

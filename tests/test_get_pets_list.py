@@ -9,11 +9,32 @@ pf = PetFriends()
 @pytest.mark.positive
 @pytest.mark.parametrize('filter', ['', 'my_pets'],
                          ids=['no filter', 'my_pets'])
-def test_valid_filter(get_key, filter):
+@pytest.mark.parametrize("accept",
+                         ["application/json", "application/xml", generate_str.n_string(30)],
+                         ids = ["application/json", "application/xml", "30 chars string"])
+def test_valid_filter(get_key, filter, accept):
     """Check the response status is 200 and the result contains a non-empty list of pets for get_pets_list request with
      valid filters"""
 
-    status, result = pf.get_pets_list(get_key, filter)
+    status, result = pf.get_pets_list(get_key, filter, accept=accept)
+    assert status == 200
+    assert 'pets' in result
+    assert len(result['pets']) > 0
+
+
+@pytest.mark.list
+@pytest.mark.positive
+@pytest.mark.parametrize("accept",
+                         ["application/json", "application/xml", generate_str.n_string(30)],
+                         ids = ["application/json", "application/xml", "30 chars string"])
+@pytest.mark.parametrize("content_type",
+                         ["application/json", "text/html", generate_str.n_string(20)],
+                         ids = ["application/json", "application/xml", "20 chars string"])
+def test_valid_content_type_accept_headers(get_key, accept, content_type, filter='my_pets'):
+    """Check the response status is 200 and the result contains a non-empty list of pets for get_pets_list request with
+     different headers"""
+
+    status, result = pf.get_pets_list(get_key, filter, accept=accept, content_type=content_type)
     assert status == 200
     assert 'pets' in result
     assert len(result['pets']) > 0

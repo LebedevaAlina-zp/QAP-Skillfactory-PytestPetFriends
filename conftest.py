@@ -50,8 +50,8 @@ def cleanup(get_key, other_key):
     # Get a list of user's pets
     _, my_pets = pf.get_pets_list(get_key, "my_pets")
 
-    # Delete all user's pets
-    for i in range(0, len(my_pets['pets'])):
+    # Delete all user's pets but one (leave one pet for get pet list tests)
+    for i in range(0, len(my_pets['pets'])-1):
     #Save the id of the first pet in the list in pet_id and try to delete one
         status, _ = pf.delete_pet(get_key, my_pets['pets'][i]['id'])
 

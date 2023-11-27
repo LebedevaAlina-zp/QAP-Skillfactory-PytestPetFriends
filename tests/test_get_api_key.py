@@ -23,6 +23,19 @@ def test_valid_user(email, password):
 
 
 @pytest.mark.key
+@pytest.mark.positive
+@pytest.mark.parametrize("accept",
+                         ["application/json", "application/xml", generate_str.n_string(30)],
+                         ids = ["application/json", "application/xml", "30 chars string"])
+def test_accept_header(accept, email=valid_email, password=valid_password):
+    """ Check a valid user can get an auth_key with different 'accept' header values. """
+
+    status, result = pf.get_api_key(email, password, accept=accept)
+    assert status == 200
+    assert 'key' in result
+
+
+@pytest.mark.key
 @pytest.mark.negative
 @pytest.mark.parametrize('email',
                          ['', generate_str.n_string(255), generate_str.n_string(1000),
